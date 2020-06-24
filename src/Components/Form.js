@@ -1,20 +1,26 @@
 import React, { Component } from 'react'
 import './CSS/todo.css'
+import axios from 'axios'
+
 
 
 
 class Form extends Component {
+
+   
     constructor(props) {
         super(props)
-
+        
         this.state = {
             firstName: "",
             lastName: "",
-            password: "",
+            emailId: "",
             gender: "",
             address:"",
 
         }
+
+       
         this.handleSubmit=this.handleSubmit.bind(this)
     }
 
@@ -28,9 +34,9 @@ class Form extends Component {
             lastName: event.target.value
         })
     }
-    passwordhandler = (event) => {
+    emailIdhandler = (event) => {
         this.setState({
-            password: event.target.value
+            emailId: event.target.value
         })
     }
 
@@ -48,30 +54,43 @@ class Form extends Component {
     }
 
     handleSubmit = (event) => {
-        alert(`${this.state.firstName} ${this.state.lastName}  Registered Successfully !!!!`)
-        console.log(this.state);
+    
+
+        // create a new XMLHttpRequest
+        var xhr = new XMLHttpRequest()
+
+        // get a callback when the server responds
+        xhr.addEventListener('load', () => {
+        // update the state of the component with the result here
+        console.log(xhr.responseText)
+        })
+        // open the request with the verb and the url
+        xhr.open('Post', 'http://localhost:8080/employee')
+        xhr.setRequestHeader('Content-Type', 'application/json')
+        
+   
+        // send the request
+        xhr.send(JSON.stringify(this.state))
+
         this.setState({
             firstName: "",
             lastName: "",
-            password: '',
+            emailId:"",
             gender: "",
             address: "",
         })
-     event.preventDefault()
-        
+     event.preventDefault()  
     }
-
-
     render() {
         return (
             <div>
 
                 <form onSubmit={this.handleSubmit}>
-                    <h1>User Registration</h1>
+                    <h1>Employee Registration</h1>
                     <label>FirstName :</label> <input type="text" value={this.state.firstName} onChange={this.firsthandler} placeholder="FirstName..." /><br />
                     <label>LastName :</label> <input type="text" value={this.state.lastName} onChange={this.lasthandler} placeholder="LastName..." /><br />
-                    <label>Password :</label> <input type="password" value={this.state.password} onChange={this.passwordhandler} placeholder="Password..." /><br />
-                    <label>Gender :</label><select onChange={this.genderhandler} defaultValue="Select Gender">
+                    <label>E    mailId :</label> <input type="text" value={this.state.emailId} onChange={this.emailIdhandler} placeholder="emailId" /><br />
+                    <label>Gender: </label><select onChange={this.genderhandler } defaultValue="Select Gender">
                         <option defaultValue>Select Gender</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
@@ -84,7 +103,9 @@ class Form extends Component {
             </div>
             
         )
+        
     }
+    
 }
 
 export default Form
