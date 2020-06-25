@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import './CSS/todo.css'
-import axios from 'axios'
 
 
 
