@@ -2,109 +2,84 @@ import React, { Component } from 'react'
 import './CSS/todo.css'
 
 
-
-
 class Form extends Component {
+  constructor(props) {
+      super(props)
 
-   
-    constructor(props) {
-        super(props)
-        
-        this.state = {
-            firstName: "",
-            lastName: "",
-            emailId: "",
-            gender: "",
-            address:"",
+      this.state = {
+          firstName: "",
+          lastName: "",
+          gender: "",
+          address:"",
 
-        }
+      }
+      this.handleSubmit=this.handleSubmit.bind(this)
+  }
 
-       
-        this.handleSubmit=this.handleSubmit.bind(this)
-    }
+  firsthandler = (event) => {
+      this.setState({
+          firstName: event.target.value
+      })
+  }
+  lasthandler = (event) => {
+      this.setState({
+          lastName: event.target.value
+      })
+  }
+ 
+  
 
-    firsthandler = (event) => {
-        this.setState({
-            firstName: event.target.value
-        })
-    }
-    lasthandler = (event) => {
-        this.setState({
-            lastName: event.target.value
-        })
-    }
-    emailIdhandler = (event) => {
-        this.setState({
-            emailId: event.target.value
-        })
-    }
+  genderhandler = (event) => {
+      this.setState({
+          gender: event.target.value
+      })
+  }
+  
+  
+    addresshandler = (event) => {
+      this.setState({
+          address: event.target.value
+      })
+  }
 
-    genderhandler = (event) => {
-        this.setState({
-            gender: event.target.value
-        })
-    }
-    
-    
-      addresshandler = (event) => {
-        this.setState({
-            address: event.target.value
-        })
-    }
+  handleSubmit = (event) => {
+      alert(`${this.state.firstName} ${this.state.lastName}  Registered Successfully !!!!`)
+      console.log(this.state);
+      this.setState({
+          firstName: "",
+          lastName: "",
+          emailId:"",
+          gender: "",
+          address: "",
+      })
+   event.preventDefault()
+      
+  }
 
-    handleSubmit = (event) => {
-    
 
-        // create a new XMLHttpRequest
-        var xhr = new XMLHttpRequest()
+  render() {
+      return (
+          <div>
 
-        // get a callback when the server responds
-        xhr.addEventListener('load', () => {
-        // update the state of the component with the result here
-        console.log(xhr.responseText)
-        })
-        // open the request with the verb and the url
-        xhr.open('Post', 'http://localhost:8080/employee')
-        xhr.setRequestHeader('Content-Type', 'application/json')
-        
-   
-        // send the request
-        xhr.send(JSON.stringify(this.state))
+              <form onSubmit={this.handleSubmit}>
+                  <h1>User Registration</h1>
+                  <label>FirstName :</label> <input type="text" value={this.state.firstName} onChange={this.firsthandler} placeholder="FirstName..." /><br />
+                  <label>LastName :</label> <input type="text" value={this.state.lastName} onChange={this.lasthandler} placeholder="LastName..." /><br />
+                  <label>EmailId :</label> <input type="text" value={this.state.emailid} onChange={this.emailid} placeholder="EmailId..." /><br />
+                  <label>Gender :</label><select onChange={this.genderhandler} defaultValue="Select Gender">
+                      <option defaultValue>Select Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                  </select><br />
+                   <label>Address :</label> <input type="text" value={this.state.address} onChange={this.addresshandler} placeholder="Address..." /><br />
+                  
+                  <input type="submit" value="Submit" />
+              </form>
 
-        this.setState({
-            firstName: "",
-            lastName: "",
-            emailId:"",
-            gender: "",
-            address: "",
-        })
-     event.preventDefault()  
-    }
-    render() {
-        return (
-            <div>
-
-                <form onSubmit={this.handleSubmit}>
-                    <h1>Employee Registration</h1>
-                    <label>FirstName :</label> <input type="text" value={this.state.firstName} onChange={this.firsthandler} placeholder="FirstName..." /><br />
-                    <label>LastName :</label> <input type="text" value={this.state.lastName} onChange={this.lasthandler} placeholder="LastName..." /><br />
-                    <label>E    mailId :</label> <input type="text" value={this.state.emailId} onChange={this.emailIdhandler} placeholder="emailId" /><br />
-                    <label>Gender: </label><select onChange={this.genderhandler } defaultValue="Select Gender">
-                        <option defaultValue>Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                    </select><br />
-                     <label>Address :</label> <input type="text" value={this.state.address} onChange={this.addresshandler} placeholder="Address..." /><br />
-                    
-                    <input type="submit" value="Submit" />
-                </form>
-
-            </div>
-            
-        )
-        
-    }
-    
+          </div>
+          
+      )
+  }
 }
 
 export default Form
