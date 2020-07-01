@@ -1,6 +1,6 @@
 import React from 'react';
-import {Table} from 'react-bootstrap';
-import './todo.css';
+import {Table,Button} from 'react-bootstrap';
+
 
 class EmployeeList extends React.Component{
     constructor(props){
@@ -50,6 +50,7 @@ class EmployeeList extends React.Component{
                 <th>emailId</th>
                 <th>gender</th>
                 <th>address</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -61,6 +62,7 @@ class EmployeeList extends React.Component{
                   <td>{employee.emailId}</td>
                   <td>{employee.gender}</td>
                   <td>{employee.address}</td>
+                  <td><Button variant="info" onClick={()=>this.props.editEmployee(employee.id)}>Edit</Button></td>
             </tr>
             
 ))}
