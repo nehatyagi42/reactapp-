@@ -1,18 +1,19 @@
-import React, { Component } from 'react';
-import './App.css';
-import { Container,Button,Alert } from 'react-bootstrap';
-import EmployeeList from './EmployeeList';
-import AddEmployee from './AddEmployee'
-import './todo.css';
-class App extends Component {
+import React, { Component } from "react";
+import "./App.css";
+import { Container, Button, Alert } from "react-bootstrap";
+import AddEmployee from "./Components/employee/AddEmployee";
+import EmployeeList from "./Components/employee/EmployeeList";
 
+class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isAddEmployee: false,
       error: null,
-      response: {}
-    }
+      employee: {},
+      response: {},
+      isEditEmployee: false,
+    };
     this.onFormSubmit = this.onFormSubmit.bind(this);
   }
 
@@ -21,42 +22,113 @@ class App extends Component {
   }
 
   onFormSubmit(data) {
-    const postapiUrl = 'http://localhost:8080/employee';
+    const apiUrl = "http://localhost:8080/employee";
     const options = {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
     };
 
-    fetch(postapiUrl, options)
-      .then(res => res.json())
-      .then(result => {
-        this.setState({
-          response: result,
-          isAddEmployee: false
-        })
-      },
-      (error) => {
-        this.setState({ error });
-      }
-    )
+    if (this.state.isEditEmployee) {
+      options.method = "PUT";
+    }
+    if (this.state.isdeleteEmployee) {
+      options.method = "DELETE";
+    }
+    fetch(apiUrl, options)
+      .then((res) => res.json())
+      .then(
+        (result) => {
+          this.setState({
+            response: result,
+            isAddEmployee: false,
+            isEditEmployee: false,
+            isdeleteEmployee: false,
+          });
+        },
+        (error) => {
+          this.setState({ error });
+        }
+      );
   }
 
+  editEmployee = (employee) => {
+    this.setState({
+      employee: employee,
+      isEditEmployee: true,
+      isAddEmployee: true,
+    });
+  };
+
+  deleteEmployee = (employeeId) => {
+    const apiUrl = "http://localhost:8080/employee/" + employeeId;
+    const options = {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    fetch(apiUrl, options)
+      .then((res) => res.json())
+      .then(
+        (result) => {
+          this.setState({
+            response: result,
+            isAddEmployee: false,
+            isEditEmployee: false,
+            isdeleteEmployee: false,
+          });
+        },
+        (error) => {
+          this.setState({ error });
+        }
+      );
+    window.location.reload();
+  };
+
   render() {
+    let employeeForm;
+    if (this.state.isAddEmployee || this.state.isEditEmployee) {
+      employeeForm = (
+        <AddEmployee
+          onFormSubmit={this.onFormSubmit}
+          employee={this.state.employee}
+        />
+      );
+    }
+
     return (
       <div className="App">
         <Container>
-          <h1 style={{textAlign:'center'}}>Employee Registeration</h1>
-          {!this.state.isAddEmployee && <Button variant="primary"   onClick={() => this.onCreate()} style={{marginRight:"70%"}}>Add Employee</Button>}
-          {this.state.response.status === 'success' && <div><br /><Alert variant="info">{this.state.response.message}</Alert></div>}
-          {!this.state.isAddEmployee && <EmployeeList />}
-          {this.state.isAddEmployee && <AddEmployee onFormSubmit={this.onFormSubmit}/>}
+          <h1 style={{ textAlign: "center" }}>Employee Registeration</h1>
+          {!this.state.isAddEmployee && (
+            <Button
+              variant="primary"
+              onClick={() => this.onCreate()}
+              style={{ marginRight: "70%" }}
+            >
+              Add Employee
+            </Button>
+          )}
+          {this.state.response.status === "success" && (
+            <div>
+              <br />
+              <Alert variant="info">{this.state.response.message}</Alert>
+            </div>
+          )}
+          {!this.state.isAddEmployee && (
+            <EmployeeList
+              editEmployee={this.editEmployee}
+              deleteEmployee={this.deleteEmployee}
+            />
+          )}
+          {employeeForm}
           {this.state.error && <div>Error: {this.state.error.message}</div>}
-          <br/>
-          <br/>
-          
+          <br />
+          <br />
         </Container>
       </div>
     );

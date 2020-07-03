@@ -1,18 +1,24 @@
 import React from'react';
 import { Row, Form, Col, Button } from 'react-bootstrap';
-import './todo.css';
+
 
 class AddEmployee extends React.Component{
     constructor(props) {
         super(props);
         this.initialState = {
+                id:"",
                 firstName: "",
                 lastName: "",
                 gender: "",
                 address:"",
                 emailId:""
             }
-            this.state = this.initialState;
+            
+    if(props.employee){
+      this.state = props.employee
+    } else {
+      this.state = this.initialState;
+    }
 
             this.handleChange = this.handleChange.bind(this);
             this.handleSubmit = this.handleSubmit.bind(this);
@@ -36,13 +42,24 @@ class AddEmployee extends React.Component{
 
 
               render() {
+
+                let pageTitle;
+                if(this.state.id) {
+                  pageTitle = <h2>Edit Employee</h2>
+                } else {
+                  pageTitle = <h2>Add Employee</h2>
+                }
+
+
+
                 return(
                   <div>
-                    <h2>Add Employee</h2>
+                      {pageTitle}
+                    
                     <Row>
                       <Col sm={6}>
                         <Form onSubmit={this.handleSubmit}>
-                          <Form.Group controlId="fName">
+                          <Form.Group controlId="firstName">
                             <Form.Label >First Name</Form.Label>
                             <Form.Control
                               type="text"
@@ -51,7 +68,7 @@ class AddEmployee extends React.Component{
                               onChange={this.handleChange}
                               placeholder="First Name"/>
                           </Form.Group>
-                          <Form.Group controlId="lName">
+                          <Form.Group controlId="lastName">
                             <Form.Label>Last Name</Form.Label>
                             <Form.Control
                               type="text"
@@ -60,7 +77,7 @@ class AddEmployee extends React.Component{
                               onChange={this.handleChange}
                               placeholder="Last Name" />
                           </Form.Group>
-                          <Form.Group controlId="email_id">
+                          <Form.Group controlId="emailId">
                             <Form.Label>EmailId</Form.Label>
                             <Form.Control
                               type="text"
@@ -70,21 +87,21 @@ class AddEmployee extends React.Component{
                               placeholder="emailId" />
                           </Form.Group>
 
-
-                          <Form.Group controlId="geNder">
+                          <Form.Group controlId="gender">
                             <Form.Label >Gender</Form.Label>
                             <Form.Control as="select" type="text" name="gender" 
                            
                             value={this.state.gender} 
                             onChange={this.handleChange}
                             placeholder="gender">
+                                <option defaultValue ="gender">Select Gender</option>
                                 <option>male</option>
                                 <option>female</option>
                                 
                             </Form.Control>
                           </Form.Group>
 
-                          <Form.Group controlId="add_ress">
+                          <Form.Group controlId="address">
                             <Form.Label>Address</Form.Label>
                             <Form.Control
                               type="text"
@@ -94,6 +111,7 @@ class AddEmployee extends React.Component{
                               placeholder="address" />
                           </Form.Group>
                           <Form.Group>
+                          <Form.Control type="hidden" name="id" value={this.state.id} />
                             <Button variant="success" type="submit">Save</Button>
                           </Form.Group>
                         </Form>
