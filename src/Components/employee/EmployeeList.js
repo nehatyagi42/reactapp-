@@ -33,18 +33,18 @@ class EmployeeList extends React.Component {
       return <div>Error:{error.message}</div>;
     } else {
       return (
-        <div>
-          <h2 style={{ marginRight: "70%" }}>Employee List </h2>
+        <div className="col-lg-12">
+          <h2>Employee List </h2>
           <br />
 
           <Table>
             <thead>
               <tr>
-                <th>firstName</th>
-                <th>lastName</th>
-                <th>emailId</th>
-                <th>gender</th>
-                <th>address</th>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Email</th>
+                <th>Gender</th>
+                <th>Address</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -53,24 +53,29 @@ class EmployeeList extends React.Component {
                 <tr key={employee.id}>
                   <td>{employee.firstName}</td>
                   <td>{employee.lastName}</td>
-                  <td>{employee.emailId}</td>
+                  <td>{employee.email}</td>
                   <td>{employee.gender}</td>
                   <td>{employee.address}</td>
                   <td>
-                    <Button
-                      variant="info"
-                      onClick={() => this.props.editEmployee(employee)}
-                    >
-                      Edit
-                    </Button>
+                    <div className="col-sm-4" style={{ marginRight: "20%" }}>
+                      <Button
+                        variant="info"
+                        onClick={() => this.props.editEmployee(employee)}
+                      >
+                        Edit
+                      </Button>
+                    </div>
                   </td>
                   <td>
-                    <Button
-                      variant="danger"
-                      onClick={() => this.props.deleteEmployee(employee.id)}
-                    >
-                      Delete
-                    </Button>
+                    <div className="col-sm-4" style={{ marginRight: "20%" }}>
+                      <Button
+                        style={{ margin: "0" }}
+                        variant="danger"
+                        onClick={() => this.props.deleteEmployee(employee.id)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
