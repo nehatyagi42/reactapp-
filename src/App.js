@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { Component } from 'react';
 import './App.css';
 import { Container,Button,Alert } from 'react-bootstrap';
@@ -43,21 +44,18 @@ class App extends Component {
       }
     )
   }
+=======
+import React, { Component } from "react";
+import "./App.css";
+import AppRoute from "./Components/Route/Route";
+import "./Components/todo.css";
+>>>>>>> feature/reactapp
 
+class App extends Component {
   render() {
     return (
       <div className="App">
-        <Container>
-          <h1 style={{textAlign:'center'}}>Employee Registeration</h1>
-          {!this.state.isAddEmployee && <Button variant="primary"   onClick={() => this.onCreate()} style={{marginRight:"70%"}}>Add Employee</Button>}
-          {this.state.response.status === 'success' && <div><br /><Alert variant="info">{this.state.response.message}</Alert></div>}
-          {!this.state.isAddEmployee && <EmployeeList />}
-          {this.state.isAddEmployee && <AddEmployee onFormSubmit={this.onFormSubmit}/>}
-          {this.state.error && <div>Error: {this.state.error.message}</div>}
-          <br/>
-          <br/>
-          
-        </Container>
+        <AppRoute />
       </div>
     );
   }
