@@ -10,6 +10,7 @@ class LoginForm extends React.Component {
       email: "",
       password: "",
       error: false,
+      errormsg: "",
     };
 
     if (props.employee) {
@@ -19,7 +20,7 @@ class LoginForm extends React.Component {
     }
 
     this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handlelogin = this.handlelogin.bind(this);
   }
 
   handleChange(event) {
@@ -31,25 +32,14 @@ class LoginForm extends React.Component {
     });
   }
 
-  handleSubmit(event) {
+  handlelogin(event) {
     event.preventDefault();
 
-    const { email, password } = this.state;
     const { history } = this.props;
 
-    this.setState({ error: false });
-
-    if (!(email === "neha@gmail.com" && password === "neha")) {
-      return this.setState({ error: true });
-    }
-
-    console.log("you're logged in. yay!");
-    store.set("loggedIn", true);
-    history.push("/employee");
     const apiUrl = "http://localhost:8080/login";
     const options = {
       method: "POST",
-
       body: JSON.stringify(this.state),
       headers: {
         "Content-Type": "application/json",
@@ -57,18 +47,28 @@ class LoginForm extends React.Component {
     };
 
     fetch(apiUrl, options)
-      .then((response) => response.json())
-      .then(
-        (response) => {
-          if (response.status === 200) {
-            return response.json();
-          }
-        },
-
-        (error) => {
-          this.setState({ error });
+      .then((response) => {
+        if (!response.ok) throw new Error(response.status);
+        else {
+          console.log("you're logged in. yay!");
+          store.set("loggedIn", true);
+          this.setState({ error: false });
+          history.push("/employee");
+          return response.json();
         }
-      );
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log("error: " + error);
+        this.setState({ error: true });
+        if (error.message === '404')
+          this.setState({ errormsg: "user not found" });
+        else if (error.message === '400')
+          this.setState({ errormsg: "Email Password is Incorrect " });
+        else this.setState({ errormsg: "Internal Error" });
+      });
     this.setState(this.initialState);
   }
 
@@ -79,13 +79,13 @@ class LoginForm extends React.Component {
       <div>
         <Row>
           <Col sm={6}>
-            <Form onSubmit={this.handleSubmit}>
+            <Form onSubmit={this.handlelogin}>
               <h3 style={{ marginTop: "5%" }}>Login</h3>
               {error && (
                 <Message
                   style={{ color: "red" }}
                   error={error}
-                  content="That username/password is incorrect. Try again!"
+                  content={this.state.errormsg}
                 />
               )}
               <Form.Group controlId="email">
