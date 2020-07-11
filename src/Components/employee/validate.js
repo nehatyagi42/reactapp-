@@ -5,12 +5,20 @@ class AddEmployee extends React.Component {
   constructor(props) {
     super(props);
     this.initialState = {
-      firstName: "",
-      lastName: "",
-      gender: "",
-      address: "",
-      email: "",
-      password: "",
+      firstName: null,
+      email: null,
+      password: null,
+      gender: null,
+      lastName: null,
+      address: null,
+      errors: {
+        firstName: "",
+        email: "",
+        password: "",
+        address: "",
+        gender: "",
+        lastName: "",
+      },
     };
 
     if (props.employee) {
@@ -26,8 +34,48 @@ class AddEmployee extends React.Component {
   handleChange(event) {
     const name = event.target.name;
     const value = event.target.value;
+    let errors = this.state.erro;
+
+    switch (name) {
+      case "firstName":
+        errors.firstName =
+          value.length < 5
+            ? "Full Name must be at least 5 characters long!"
+            : "";
+        break;
+      case "lastName":
+        errors.lastName =
+          value.length < 5
+            ? "Full Name must be at least 5 characters long!"
+            : "";
+        break;
+      case "address":
+        errors.address =
+          value.length < 5
+            ? "Full Name must be at least 5 characters long!"
+            : "";
+        break;
+      case "gender":
+        errors.gender =
+          value.length < 5
+            ? "Full Name must be at least 5 characters long!"
+            : "";
+        break;
+      case "email":
+        errors.email = validEmailRegex.test(value) ? "" : "Email is not valid!";
+        break;
+      case "password":
+        errors.password =
+          value.length < 8
+            ? "Password must be at least 8 characters long!"
+            : "";
+        break;
+      default:
+        break;
+    }
 
     this.setState({
+      errors,
       [name]: value,
     });
   }
@@ -36,9 +84,15 @@ class AddEmployee extends React.Component {
     event.preventDefault();
     this.props.onFormSubmit(this.state);
     this.setState(this.initialState);
+    if (validateForm(this.state.errors)) {
+      console.info("Valid Form");
+    } else {
+      console.error("Invalid Form");
+    }
   }
 
   render() {
+    const { errors } = this.state;
     let pageTitle;
     if (this.state.id) {
       pageTitle = (
@@ -56,7 +110,7 @@ class AddEmployee extends React.Component {
         <Row>
           <Col sm={6}>
             <br />
-            <Form onSubmit={this.handleSubmit}>
+            <Form onSubmit={this.handleSubmit} noValidate>
               <Form.Group controlId="firstName">
                 <Form.Label>First Name</Form.Label>
                 <Form.Control
@@ -66,7 +120,9 @@ class AddEmployee extends React.Component {
                   onChange={this.handleChange}
                   placeholder="First Name"
                   required
+                  noValidate
                 />
+                {errors.firstName}
               </Form.Group>
               <Form.Group controlId="lastName">
                 <Form.Label>Last Name</Form.Label>
@@ -77,7 +133,9 @@ class AddEmployee extends React.Component {
                   onChange={this.handleChange}
                   placeholder="Last Name"
                   required
+                  noValidate
                 />
+                {errors.lastName}
               </Form.Group>
               <Form.Group controlId="email">
                 <Form.Label>Email</Form.Label>
@@ -88,7 +146,9 @@ class AddEmployee extends React.Component {
                   onChange={this.handleChange}
                   placeholder="email"
                   required
+                  noValidate
                 />
+                {errors.email}
               </Form.Group>
               <Form.Group controlId="password">
                 <Form.Label>Password</Form.Label>
@@ -99,7 +159,9 @@ class AddEmployee extends React.Component {
                   onChange={this.handleChange}
                   placeholder="Password"
                   required
+                  noValidate
                 />
+                {errors.password}
               </Form.Group>
               <Form.Group controlId="gender">
                 <Form.Label>Gender</Form.Label>
@@ -110,11 +172,13 @@ class AddEmployee extends React.Component {
                   value={this.state.gender}
                   onChange={this.handleChange}
                   placeholder="gender"
+                  required
+                  noValidate
                 >
                   <option defaultValue="gender">Select Gender</option>
                   <option>male</option>
                   <option>female</option>
-                  required
+                  {errors.gender}
                 </Form.Control>
               </Form.Group>
 
@@ -127,7 +191,9 @@ class AddEmployee extends React.Component {
                   onChange={this.handleChange}
                   placeholder="address"
                   required
+                  novalidate
                 />
+                {errors.address}
               </Form.Group>
 
               <Form.Group>
@@ -145,3 +211,12 @@ class AddEmployee extends React.Component {
 }
 
 export default AddEmployee;
+
+const validEmailRegex = RegExp(
+  /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+);
+const validateForm = (errors) => {
+  let valid = true;
+  Object.values(errors).forEach((val) => val.length > 0 && (valid = false));
+  return valid;
+};

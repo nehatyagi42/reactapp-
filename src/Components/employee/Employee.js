@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Container, Button, Alert } from "react-bootstrap";
 import EmployeeList from "./EmployeeList";
 import AddEmployee from "./AddEmployee";
-
+import Header from "../header/Header";
 class Employee extends Component {
   constructor(props) {
     super(props);
@@ -99,6 +99,7 @@ class Employee extends Component {
 
     return (
       <div className="Employee">
+        <Header />
         <Container>
           {!this.state.isAddEmployee && (
             <Button

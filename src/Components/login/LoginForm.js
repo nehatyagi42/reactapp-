@@ -2,9 +2,11 @@ import React from "react";
 import { Row, Form, Col, Button } from "react-bootstrap";
 import store from "store";
 import { Message } from "semantic-ui-react";
+import Header from "../header/Header";
 
 class LoginForm extends React.Component {
   constructor(props) {
+    store.clear();
     super(props);
     this.initialState = {
       email: "",
@@ -51,7 +53,7 @@ class LoginForm extends React.Component {
         if (!response.ok) throw new Error(response.status);
         else {
           console.log("you're logged in. yay!");
-          store.set("loggedIn", true);
+          store.set("login", true);
           this.setState({ error: false });
           history.push("/employee");
           return response.json();
@@ -63,9 +65,9 @@ class LoginForm extends React.Component {
       .catch((error) => {
         console.log("error: " + error);
         this.setState({ error: true });
-        if (error.message === '404')
+        if (error.message === "404")
           this.setState({ errormsg: "user not found" });
-        else if (error.message === '400')
+        else if (error.message === "400")
           this.setState({ errormsg: "Email Password is Incorrect " });
         else this.setState({ errormsg: "Internal Error" });
       });
@@ -77,6 +79,7 @@ class LoginForm extends React.Component {
 
     return (
       <div>
+        <Header />
         <Row>
           <Col sm={6}>
             <Form onSubmit={this.handlelogin}>
