@@ -3,53 +3,23 @@ import { Container, Button, Alert } from "react-bootstrap";
 import EmployeeList from "./EmployeeList";
 import AddEmployee from "./AddEmployee";
 import Header from "../header/Header";
+import { Link } from "react-router-dom";
+
+
 class Employee extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isAddEmployee: false,
       error: null,
-      employee: {},
+      employee: { id: "" },
       response: {},
       isEditEmployee: false,
     };
-    this.onFormSubmit = this.onFormSubmit.bind(this);
   }
 
   onCreate() {
     this.setState({ isAddEmployee: true });
-  }
-
-  onFormSubmit(data) {
-    const apiUrl = "http://localhost:8080/employee";
-    const options = {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    if (this.state.isEditEmployee) {
-      options.method = "PUT";
-    }
-    if (this.state.isdeleteEmployee) {
-      options.method = "DELETE";
-    }
-    fetch(apiUrl, options)
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          this.setState({
-            response: result,
-            isAddEmployee: false,
-            isEditEmployee: false,
-          });
-        },
-        (error) => {
-          this.setState({ error });
-        }
-      );
   }
 
   editEmployee = (employee) => {
@@ -89,29 +59,31 @@ class Employee extends Component {
   render() {
     let employeeForm;
     if (this.state.isAddEmployee || this.state.isEditEmployee) {
-      employeeForm = (
-        <AddEmployee
-          onFormSubmit={this.onFormSubmit}
-          employee={this.state.employee}
-        />
-      );
+      employeeForm = <AddEmployee emp={this.state.employee} />;
     }
 
     return (
       <div className="Employee">
         <Header />
+
+
         <Container>
+<div className="col-sm-2">
           {!this.state.isAddEmployee && (
             <Button
-              className="col-sm-2"
+             
               variant="secondary"
               onClick={() => this.onCreate()}
-              style={{ marginRight: "90%", marginTop: "2%" }}
+              style={{ marginRight: "5%", marginTop: "3%"}}
             >
               Add Employee
             </Button>
           )}
-          {this.state.response.status === "success" && (
+
+          </div>
+
+
+          {this.state.response.status === "primary" && (
             <div>
               <br />
               <Alert variant="info">{this.state.response.message}</Alert>

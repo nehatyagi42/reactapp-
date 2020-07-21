@@ -11,7 +11,7 @@ class Header extends React.Component {
   render() {
     return (
       <Navbar bg="dark" variant="dark">
-        <Navbar.Brand href="">Employee Registeration</Navbar.Brand>
+        <Navbar.Brand href="employee">Employee Registeration</Navbar.Brand>
         <Navbar.Toggle />
         <Navbar.Collapse className="justify-content-end">
           {store.get("login") ? (

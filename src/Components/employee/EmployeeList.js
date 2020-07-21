@@ -67,7 +67,7 @@ class EmployeeList extends React.Component {
                     </div>
                   </td>
                   <td>
-                    <div className="col-sm-4" style={{ marginRight: "20%" }}>
+                    <div className="col-sm-2">
                       <Button
                         style={{ margin: "0" }}
                         variant="danger"

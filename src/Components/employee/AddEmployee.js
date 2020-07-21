@@ -1,147 +1,239 @@
 import React from "react";
-import { Row, Form, Col, Button } from "react-bootstrap";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import "./newemp.css";
+import { Button } from "react-bootstrap";
 
-class AddEmployee extends React.Component {
-  constructor(props) {
-    super(props);
-    this.initialState = {
-      firstName: "",
-      lastName: "",
-      gender: "",
-      address: "",
-      email: "",
-      password: "",
+function AddEmployee({ emp }) {
+  const isAddMode = emp.id === "" ? true : false;
+
+  const initval = {
+    id: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    address: "",
+    gender: "",
+  };
+
+  const validate = Yup.object().shape({
+    firstName: Yup.string().required("FirstName is required"),
+    lastName: Yup.string().required("LastName is required"),
+    email: Yup.string().email().required("email is required"),
+    password: Yup.string()
+      .min(4, "Password Must be four characters long!")
+      .max(20, "Too Long!")
+      .required("Password is Required"),
+
+    address: Yup.string().required("address is required"),
+    gender: Yup.string().required("gender is required"),
+  });
+
+  function onSubmit(fields, setSubmitting) {
+    // alert(fields, null, 2);
+    upsertEmployee(fields, setSubmitting);
+
+    return new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
+  function upsertEmployee(fields, setSubmitting) {
+    console.log("i cam here...");
+    const apiUrl = "http://localhost:8080/employee";
+    const options = {
+      method: "POST",
+      body: JSON.stringify(fields),
+      headers: {
+        "Content-Type": "application/json",
+      },
     };
 
-    if (props.employee) {
-      this.state = props.employee;
-    } else {
-      this.state = this.initialState;
+    if (!isAddMode) {
+      options.method = "PUT";
     }
 
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
+    fetch(apiUrl, options)
+      .then((res) => res.json(fields))
 
-  handleChange(event) {
-    const name = event.target.name;
-    const value = event.target.value;
+      .then(
+        (result) => {
+          //  props.history.push("/employee");
+        },
 
-    this.setState({
-      [name]: value,
-    });
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-    this.props.onFormSubmit(this.state);
-    this.setState(this.initialState);
-  }
-
-  render() {
-    let pageTitle;
-    if (this.state.id) {
-      pageTitle = (
-        <h2 style={{ marginRight: "45%", marginTop: "3%" }}>Edit Employee</h2>
+        (error) => {
+          setSubmitting(false);
+          // props.history.push("/employee");
+          console.log(error);
+        }
       );
-    } else {
-      pageTitle = (
-        <h2 style={{ marginRight: "45%", marginTop: "3%" }}>Add Employee</h2>
-      );
-    }
-    return (
-      <div>
-        {pageTitle}
+    //we are using this command when we are click on submit button and  we want to display our data in list
+    window.location.reload();
+  }
 
-        <Row>
-          <Col sm={6}>
-            <br />
-            <Form onSubmit={this.handleSubmit}>
-              <Form.Group controlId="firstName">
-                <Form.Label>First Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="firstName"
-                  value={this.state.firstName}
-                  onChange={this.handleChange}
-                  placeholder="First Name"
-                  required
-                />
-              </Form.Group>
-              <Form.Group controlId="lastName">
-                <Form.Label>Last Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="lastName"
-                  value={this.state.lastName}
-                  onChange={this.handleChange}
-                  placeholder="Last Name"
-                  required
-                />
-              </Form.Group>
-              <Form.Group controlId="email">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="email"
-                  value={this.state.email}
-                  onChange={this.handleChange}
-                  placeholder="email"
-                  required
-                />
-              </Form.Group>
-              <Form.Group controlId="password">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="password"
-                  value={this.state.password}
-                  onChange={this.handleChange}
-                  placeholder="Password"
-                  required
-                />
-              </Form.Group>
-              <Form.Group controlId="gender">
-                <Form.Label>Gender</Form.Label>
-                <Form.Control
-                  as="select"
-                  type="text"
-                  name="gender"
-                  value={this.state.gender}
-                  onChange={this.handleChange}
-                  placeholder="gender"
-                >
-                  <option defaultValue="gender">Select Gender</option>
-                  <option>male</option>
-                  <option>female</option>
-                  required
-                </Form.Control>
-              </Form.Group>
+  return (
+    <div>
+      <Formik
+        initialValues={!isAddMode ? emp : initval}
+        enableReinitialize
+        onSubmit={onSubmit}
+        validationSchema={validate}
+      >
+        {({
+          errors,
+          values,
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          touched,
+          isSubmitting,
+          setFieldValue,
+        }) => {
+          return (
+            <form onSubmit={handleSubmit}>
+              <h3 style={{ marginLeft: "30%", marginTop: "3%" }}>
+                {" "}
+                {!isAddMode ? "Edit" : "Add"} Employee
+              </h3>
+              <label htmlFor="firstName" style={{ display: "block" }}>
+                First Name
+              </label>
+              <input
+                id="firstName"
+                placeholder="Enter your firtname"
+                type="text"
+                value={values.firstName}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={
+                  errors.firstName && touched.firstName
+                    ? "text-input error"
+                    : "text-input"
+                }
+              />
+              {errors.firstName && touched.firstName && (
+                <div className="input-feedback">{errors.firstName}</div>
+              )}
+              <label htmlFor="lastName" style={{ display: "block" }}>
+                Last Name
+              </label>
+              <input
+                id="lastName"
+                placeholder="Enter your lastname"
+                type="text"
+                value={values.lastName}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={
+                  errors.lastName && touched.lastName
+                    ? "text-input error"
+                    : "text-input"
+                }
+              />
+              {errors.lastName && touched.lastName && (
+                <div className="input-feedback">{errors.lastName}</div>
+              )}
+              <label htmlFor="email" style={{ display: "block" }}>
+                Email
+              </label>
+              <input
+                id="email"
+                placeholder="Enter your email"
+                type="text"
+                value={values.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={
+                  errors.email && touched.email
+                    ? "text-input error"
+                    : "text-input"
+                }
+              />
+              {errors.email && touched.email && (
+                <div className="input-feedback">{errors.email}</div>
+              )}
+              <label htmlFor="password" style={{ display: "block" }}>
+                Password
+              </label>
+              <input
+                id="password"
+                placeholder="Enter your password"
+                type="password"
+                value={values.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={
+                  errors.password && touched.password
+                    ? "text-input error"
+                    : "text-input"
+                }
+              />
+              {errors.password && touched.password && (
+                <div className="input-feedback">{errors.password}</div>
+              )}
+              <label htmlFor="address" style={{ display: "block" }}>
+                Address
+              </label>
+              <input
+                id="address"
+                placeholder="Enter your address"
+                type="text"
+                value={values.address}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={
+                  errors.address && touched.address
+                    ? "text-input error"
+                    : "text-input"
+                }
+              />
+              {errors.address && touched.address && (
+                <div className="input-feedback">{errors.address}</div>
+              )}
+              <label htmlFor="gender" style={{ display: "block" }}>
+                Gender
+              </label>
+              <select
+                name="gender"
+                value={values.gender}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={
+                  errors.gender && touched.gender
+                    ? "text-select error"
+                    : "text-select"
+                }
+              >
+                <option defaultValue="gender">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+              {errors.gender && touched.gender && (
+                <div className="select-feedback">{errors.gender}</div>
+              )}
 
-              <Form.Group controlId="address">
-                <Form.Label>Address</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="address"
-                  value={this.state.address}
-                  onChange={this.handleChange}
-                  placeholder="address"
-                  required
-                />
-              </Form.Group>
-
-              <Form.Group>
-                <Form.Control type="hidden" name="id" value={this.state.id} />
-                <Button variant="success" type="submit">
-                  Save
+              <div className="col-sm-2" style={{ marginTop: "5%" }}>
+                <input type="hidden" name="id" value={values.id} />
+                <Button variant="primary" type="submit" disabled={isSubmitting}>
+                  Submit
                 </Button>
-              </Form.Group>
-            </Form>
-          </Col>
-        </Row>
-      </div>
-    );
-  }
+              </div>
+              <div className="col-sm-4" style={{ marginTop: "5%" }}>
+                <Button
+                  variant="secondary"
+                  type="submit"
+                  disabled={isSubmitting}
+                  href="employee"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          );
+        }}
+      </Formik>
+    </div>
+  );
 }
 
 export default AddEmployee;

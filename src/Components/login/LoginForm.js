@@ -1,41 +1,67 @@
 import React from "react";
-import { Row, Form, Col, Button } from "react-bootstrap";
 import store from "store";
-import { Message } from "semantic-ui-react";
-import Header from "../header/Header";
+import "./login.css";
+
+const validEmailRegex = RegExp(
+  /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+);
+const validateForm = (errors) => {
+  let valid = true;
+  Object.values(errors).forEach((val) => val.length > 0 && (valid = false));
+  return valid;
+};
 
 class LoginForm extends React.Component {
-  constructor(props) {
-    store.clear();
+  constructor(props) {  
     super(props);
-    this.initialState = {
-      email: "",
-      password: "",
+    this.state = {
+      email: null,
+      password: null,
       error: false,
-      errormsg: "",
+      //errormsg: "",
+      errors: {
+        email: "",
+        password: "",
+        backend: "",
+      },
     };
-
-    if (props.employee) {
-      this.state = props.employee;
-    } else {
-      this.state = this.initialState;
-    }
+    store.clear();
 
     this.handleChange = this.handleChange.bind(this);
-    this.handlelogin = this.handlelogin.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
   }
 
   handleChange(event) {
-    const name = event.target.name;
-    const value = event.target.value;
+    event.preventDefault();
+    const { name, value } = event.target;
+    let errors = this.state.errors;
 
-    this.setState({
-      [name]: value,
-    });
+    switch (name) {
+      case "email":
+        errors.email = validEmailRegex.test(value) ? "" : "Email is not valid!";
+        break;
+      case "password":
+        errors.password =
+          value.length < 8
+            ? "Password must be at least 8 characters long!"
+            : "";
+        break;
+      default:
+        break;
+    }
+
+    this.setState({ errors, [name]: value });
   }
 
-  handlelogin(event) {
+  handleLogin(event) {
     event.preventDefault();
+    if (validateForm(this.state.errors)) {
+      console.info("Valid Form");
+    } else {
+      console.error("Invalid Form");
+    }
+
+    let errors = this.state.errors;
 
     const { history } = this.props;
 
@@ -65,68 +91,53 @@ class LoginForm extends React.Component {
       .catch((error) => {
         console.log("error: " + error);
         this.setState({ error: true });
-        if (error.message === "404")
-          this.setState({ errormsg: "user not found" });
+        if (error.message === "404") errors.backend = "User not Found!!!";
         else if (error.message === "400")
-          this.setState({ errormsg: "Email Password is Incorrect " });
-        else this.setState({ errormsg: "Internal Error" });
+          errors.backend = "Email Password is Incorrect!! ";
+        else errors.backend = "Internal Error";
       });
     this.setState(this.initialState);
   }
 
   render() {
-    const { error } = this.state;
-
+    const { error, errors } = this.state;
     return (
-      <div>
-        <Header />
-        <Row>
-          <Col sm={6}>
-            <Form onSubmit={this.handlelogin}>
-              <h3 style={{ marginTop: "5%" }}>Login</h3>
-              {error && (
-                <Message
-                  style={{ color: "red" }}
-                  error={error}
-                  content={this.state.errormsg}
-                />
+      <div className="wrapper">
+        <div className="form-wrapper">
+          <div>
+            <h2>Login</h2>
+            {error && <span className="error">{errors.backend}</span>}
+          </div>
+          <form onSubmit={this.handleLogin} noValidate>
+            <div className="email">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                name="email"
+                onChange={this.handleChange}
+                noValidate
+              />
+              {errors.email.length > 0 && (
+                <span className="error">{errors.email}</span>
               )}
-              <Form.Group controlId="email">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="email"
-                  value={this.state.email}
-                  onChange={this.handleChange}
-                  placeholder="email"
-                  required
-                />
-              </Form.Group>
-              <Form.Group controlId="password">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="password"
-                  value={this.state.password}
-                  onChange={this.handleChange}
-                  placeholder="Password"
-                  required
-                />
-              </Form.Group>
-
-              <Form.Group>
-                {/*    <Form.Control type="hidden" name="id" value={this.state.id} /> */}
-                <Button
-                  variant="success"
-                  className="btn btn-success"
-                  type="submit"
-                >
-                  Login
-                </Button>
-              </Form.Group>
-            </Form>
-          </Col>
-        </Row>
+            </div>
+            <div className="password">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                name="password"
+                onChange={this.handleChange}
+                noValidate
+              />
+              {errors.password.length > 0 && (
+                <span className="error">{errors.password}</span>
+              )}
+            </div>
+            <div className="submit">
+              <button>Submit</button>
+            </div>
+          </form>
+        </div>
       </div>
     );
   }
